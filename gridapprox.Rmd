@@ -1,0 +1,56 @@
+---
+title: "Teachers' knowledge of cogsci"
+author: "Anita Kurm"
+date: "February 21, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#wd
+setwd("C:/Users/JARVIS/Desktop/Uni/Semester 4/Computational modelling/CogSci-knowledge")
+
+#libraries
+pacman::p_load(readr,groupdata2,ggplot2,tidyverse,data.table, rethinking)
+
+#define grid
+dens=20
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, flat prior in this case
+prior<- rep(1,dens)
+#prior<- ifelse(p_grid<0.5, 0, 1) informed 
+#prior<- exp(-5*abs(p_grid-0.5)) conservative
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(6, size = 9, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, posterior, type="b", xlab="probability of water", ylab="posterior probability")
+mtext("20 points")
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

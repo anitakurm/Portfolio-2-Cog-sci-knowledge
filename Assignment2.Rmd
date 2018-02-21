@@ -1,0 +1,279 @@
+---
+title: "Computational Modeling - Week 4 - Assignment 2 - Part 1"
+author: "Riccardo Fusaroli"
+date: "2/19/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## In this assignment we learn how to assess rates from a binomial distribution, using the case of assessing your teachers' knowledge of CogSci
+
+### First part
+
+You want to assess your teachers' knowledge of cognitive science. "These guys are a bunch of drama(turgist) queens, mindless philosophers, chattering communication people and Russian spies. Do they really know CogSci?", you think.
+
+To keep things simple (your teachers should not be faced with too complicated things):
+- You created a pool of equally challenging questions on CogSci
+- Each question can be answered correctly or not (we don't allow partially correct answers, to make our life simpler).
+- Knowledge of CogSci can be measured on a scale from 0 (negative knowledge, all answers wrong) through 0.5 (random chance) to 1 (awesome CogSci superpowers)
+
+This is the data:
+- Riccardo: 3 correct answers out of 6 questions
+- Kristian: 2 correct answers out of 2 questions (then he gets bored)
+- Josh: 160 correct answers out of 198 questions (Josh never gets bored)
+- Mikkel: 66 correct answers out of 132 questions
+
+Questions:
+
+1. What's Riccardo's estimated knowledge of CogSci? What is the probability he knows more than chance (0.5) [try figuring this out. if you can't peek into chapters 3.1 and 3.2 and/or the slides]?
+- First implement a grid approximation (hint check paragraph 2.4.1!) with a uniform prior, calculate the posterior and plot the results
+- Then implement a quadratic approximation (hint check paragraph 2.4.2!).
+- N.B. for the rest of the exercise just keep using the grid approximation (we'll move to quadratic approximations in two classes)
+```{r}
+#wd
+setwd("C:/Users/JARVIS/Desktop/Uni/Semester 4/Computational modelling/CogSci-knowledge")
+
+#libraries
+pacman::p_load(readr,groupdata2,ggplot2,tidyverse,data.table, rethinking)
+
+#define grid for Riccardo
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, flat prior in this case
+prior<- rep(1,dens)
+#prior<- ifelse(p_grid<0.5, 0, 1) informed 
+#prior<- exp(-5*abs(p_grid-0.5)) conservative
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(3, size = 6, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+
+plot(p_grid, prior, xlab="probability of Riccardo giving a correct answer", ylab="prior probability")
+mtext("Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
+mtext("Posterior: grid approximation")
+
+
+#QUADRATIC APPROXIMATION
+#riccardo.qa<- map( #provide a formula, a list of data, a list of start values for the parameters
+  #alist(w~dbinom(q,p), #binomial likelihood
+        #p~dunif(0,1) #uniform prior, uniform distribution
+        #),
+  #data=list(w=3, q=6))
+
+riccardo.qa<- map( #provide a formula, a list of data, a list of start values for the parameters
+  alist(w~dbinom(6,p), #binomial likelihood
+        p~dunif(0,1) #uniform prior
+        ),
+  data=list(w=3))
+
+#display summary of qudratic approximation
+precis(riccardo.qa) 
+
+#mean - peak at 0.5
+#stddev - 0.2
+
+#quadratic aaproximation
+curve(dnorm(x,0.5,0.2)/2, lty=2, xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
+mtext("Posterior: quadratic approximation")
+
+
+#What's his most likely parameter for knowledge?
+max(posterior)
+p_grid[posterior==max(posterior)] #0.4994995 - 0.5005005 
+
+#What's his estimated knowledge? - THE ENTIRE POSTERIOR!
+ 
+#What's the probability of him knowing better than chance?
+#add up posterior probability where p>0.5
+sum(posterior[p_grid>0.5])
+
+```
+
+
+2. Estimate all the teachers' knowledge of CogSci. Who's best? Use grid approximation. Comment on the posteriors of Riccardo and Mikkel.
+2a. Produce plots of the prior, and posterior for each teacher.
+
+```{r}
+#define grid for Kristian
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, flat prior in this case
+prior<- rep(1,dens)
+#prior<- ifelse(p_grid<0.5, 0, 1) informed 
+#prior<- exp(-5*abs(p_grid-0.5)) conservative
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(2, size = 2, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Kristian giving a correct answer", ylab="prior probability")
+mtext("Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
+mtext("Posterior")
+
+
+```
+```{r}
+####################################################################################
+#define grid for Josh
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, flat prior in this case
+prior<- rep(1,dens)
+#prior<- ifelse(p_grid<0.5, 0, 1) informed 
+#prior<- exp(-5*abs(p_grid-0.5)) conservative
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(160, size = 198, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
+mtext("Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
+mtext("Posterior")
+```
+
+```{r}
+############################################################################
+#define grid for Mikkel
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, flat prior in this case
+prior<- rep(1,dens)
+#prior<- ifelse(p_grid<0.5, 0, 1) informed 
+#prior<- exp(-5*abs(p_grid-0.5)) conservative
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(66, size = 132, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
+mtext("Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
+mtext("Posterior")
+```
+
+3. Change the prior. Given your teachers have all CogSci jobs, you should start with a higher appreciation of their knowledge: the prior is a normal distribution with a mean of 0.8 and a standard deviation of 0.2. Do the results change (and if so how)?
+3a. Produce plots of the prior and posterior for each teacher.
+```{r}
+#change the prior
+#prior<- gaussian
+#define grid for Riccardo
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, prior is a normal distribution 
+prior<- dnorm(p_grid, mean=0.8, sd=0.2)
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(3, size = 6, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+
+plot(p_grid, prior, xlab="probability of Riccardo giving a correct answer", ylab="prior probability")
+mtext("Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
+mtext("Posterior")
+
+#What's Riccardo's most likely parameter for knowledge now?
+p_grid[posterior==max(posterior)] #was: 0.4994995 - 0.5005005 #now: 0.6466466
+ 
+#What's the probability of him knowing better than chance?
+#add up posterior probability where p>0.5
+sum(posterior[p_grid>0.5]) #84%
+
+```
+
+Repeat for Kristian:
+```{r}
+#define grid
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, prior is a normal distribution 
+prior<- dnorm(p_grid, mean=0.8, sd=0.2)
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(2, size = 2, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Kristian giving a correct answer", ylab="prior probability")
+mtext("Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
+mtext("Posterior")
+
+
+```
+
+Now Josh:
+```{r}
+
+```
+
+4. You go back to your teachers and collect more data (multiply the previous numbers by 100). Calculate their knowledge with both a uniform prior and a normal prior with a mean of 0.8 and a standard deviation of 0.2. Do you still see a difference between the results? Why?
+
+5. Imagine you're a skeptic and think your teachers do not know anything about CogSci, given the content of their classes. How would you operationalize that belief?
+
+6. Optional question: Can you estimate the difference between Riccardo's estimated knowledge and that of each of the other teachers? Would you deem it credible (that is, would you believe that it is actually different)?
+
+7. Bonus knowledge: all the stuff we have done can be implemented in a lme4-like fashion using the brms package. Here is an example.
+```{r}
+library(brms)
+d <- data.frame(
+  Correct=c(3,2,160,66),
+  Questions=c(6,2,198,132),
+  Teacher=c("RF","KT","JS","MW"))
+
+FlatModel <- brm(Correct|trials(Questions)~1,data=subset(d,Teacher=="RF"),prior=prior("uniform(0,1)", class = "Intercept"))
+plot(FlatModel)
+PositiveModel <- brm(Correct|trials(Questions)~1,data=subset(d,Teacher=="RF"),prior=prior("normal(0.8,0.2)", class = "Intercept"))
+plot(PositiveModel)
+SkepticalModel <- brm(Correct|trials(Questions)~1,data=subset(d,Teacher=="RF"),prior=prior("normal(0.5,0.01)", class = "Intercept"))
+plot(SkepticalModel)
+```
+
+If you dare, try to tweak the data and model to test two hypotheses:
+- Is Kristian different from Josh?
+- Is Josh different from chance?
+
+
+
