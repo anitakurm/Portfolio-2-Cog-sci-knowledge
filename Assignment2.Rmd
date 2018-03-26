@@ -429,7 +429,100 @@ plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct ans
 mtext("Posterior with a normal prior")
 ```
 
+Mikkel:
+```{r}
+#define grid for Mikkel
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, flat prior in this case
+prior<- rep(1,dens)
+
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(6600, size = 13200, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
+mtext("Uniform Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
+mtext("Posterior with a uniform prior")
+
+
+######### Normal prior 
+#define prior, prior is a normal distribution 
+prior<- dnorm(p_grid, mean=0.8, sd=0.2)
+
+#likelihood is the same
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
+mtext("Normal Prior")
+plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
+mtext("Posterior with a normal prior")
+```
+
+
 5. Imagine you're a skeptic and think your teachers do not know anything about CogSci, given the content of their classes. How would you operationalize that belief?
+```{r}
+#Josh
+#define grid
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#step prior maybe? 
+prior<- ifelse(p_grid<0.5, 1, 0)
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(160, size = 198, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
+mtext("Step prior")
+plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
+mtext("Posterior with a step prior")
+
+
+
+#or normal prior, where most of probability is lying in the interval until 0.5
+#define grid
+dens=1000
+p_grid<- seq(from=0, to=1, length.out=dens)
+
+#define prior, prior is a normal distribution 
+prior<- dnorm(p_grid, mean=0, sd=0.2)
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(160, size = 198, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
+mtext("Normal prior")
+plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
+mtext("Posterior with a normal prior")
+
+```
+
 
 6. Optional question: Can you estimate the difference between Riccardo's estimated knowledge and that of each of the other teachers? Would you deem it credible (that is, would you believe that it is actually different)?
 
