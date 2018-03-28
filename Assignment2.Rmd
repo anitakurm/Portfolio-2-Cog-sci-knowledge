@@ -123,12 +123,13 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Kristian giving a correct answer", ylab="prior probability")
+plot(p_grid, prior, xlab="probability of a teacher giving a correct answer", ylab="prior probability")
 mtext("Prior")
 plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
 mtext("Posterior")
 
-
+#add up posterior probability where p>0.5
+sum(posterior[p_grid>0.5])
 ```
 ```{r}
 ####################################################################################
@@ -150,10 +151,14 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
+
 plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
 mtext("Prior")
 plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
 mtext("Posterior")
+
+#add up posterior probability where p>0.5
+sum(posterior[p_grid>0.5])
 ```
 
 ```{r}
@@ -180,6 +185,10 @@ plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="
 mtext("Prior")
 plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
 mtext("Posterior")
+
+#add up posterior probability where p>0.5
+sum(posterior[p_grid>0.5])
+
 ```
 
 3. Change the prior. Given your teachers have all CogSci jobs, you should start with a higher appreciation of their knowledge: the prior is a normal distribution with a mean of 0.8 and a standard deviation of 0.2. Do the results change (and if so how)?
@@ -204,7 +213,7 @@ unstd.posterior<- likelihood*prior
 posterior<- unstd.posterior/sum(unstd.posterior)
 
 
-plot(p_grid, prior, xlab="probability of Riccardo giving a correct answer", ylab="prior probability")
+plot(p_grid, prior, xlab="probability of a teacher giving a correct answer", ylab="prior probability")
 mtext("Prior")
 plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
 mtext("Posterior")
@@ -480,8 +489,8 @@ mtext("Posterior with a normal prior")
 dens=1000
 p_grid<- seq(from=0, to=1, length.out=dens)
 
-#step prior maybe? 
-prior<- ifelse(p_grid<0.5, 1, 0)
+#normal distribution with the mean 0.5 and std dev of 0.1
+prior<- dnorm(p_grid, mean=0.5, sd=0.1)
 
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(160, size = 198, prob = p_grid)
@@ -492,34 +501,10 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
-mtext("Step prior")
+plot(p_grid, prior, xlab="probability of a teacher giving a correct answer", ylab="prior probability")
+mtext("Skeptic random chance prior")
 plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a step prior")
-
-
-
-#or normal prior, where most of probability is lying in the interval until 0.5
-#define grid
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-#define prior, prior is a normal distribution 
-prior<- dnorm(p_grid, mean=0, sd=0.2)
-
-#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
-likelihood<- dbinom(160, size = 198, prob = p_grid)
-
-#compute product of likelihood and prior
-unstd.posterior<- likelihood*prior
-
-#standardize the posterior, so it sums to 1
-posterior<- unstd.posterior/sum(unstd.posterior)
-
-plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
-mtext("Normal prior")
-plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a normal prior")
+mtext("Posterior with a skeptic prior")
 
 ```
 
