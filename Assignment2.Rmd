@@ -39,7 +39,7 @@ setwd("C:/Users/JARVIS/Desktop/Uni/Semester 4/Computational modelling/Portfolio-
 #libraries
 pacman::p_load(readr,groupdata2,ggplot2,tidyverse,data.table, rethinking)
 
-#define grid for Riccardo
+#define grid
 dens=1000
 p_grid<- seq(from=0, to=1, length.out=dens)
 
@@ -47,7 +47,10 @@ p_grid<- seq(from=0, to=1, length.out=dens)
 prior<- rep(1,dens)
 #prior<- ifelse(p_grid<0.5, 0, 1) informed 
 #prior<- exp(-5*abs(p_grid-0.5)) conservative
+```
 
+Riccardo:
+```{r}
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(3, size = 6, prob = p_grid)
 
@@ -57,12 +60,26 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
+dR <- data.frame(
+  Name=rep("Riccardo",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
 
-plot(p_grid, prior, xlab="probability of Riccardo giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
-mtext("Posterior: grid approximation")
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dR, aes(Grid,Posterior))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Riccardo's knowledge estimated with a flat prior")
 
+#plot the prior too
+ggplot(dR, aes(Grid,Prior))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Prior probability") +
+  labs(title="The flat prior")
 
 #QUADRATIC APPROXIMATION
 #riccardo.qa<- map( #provide a formula, a list of data, a list of start values for the parameters
@@ -97,23 +114,15 @@ p_grid[posterior==max(posterior)] #0.4994995 - 0.5005005
 #What's the probability of him knowing better than chance?
 #add up posterior probability where p>0.5
 sum(posterior[p_grid>0.5])
-
 ```
+
 
 
 2. Estimate all the teachers' knowledge of CogSci. Who's best? Use grid approximation. Comment on the posteriors of Riccardo and Mikkel.
 2a. Produce plots of the prior, and posterior for each teacher.
 
+Kristian:
 ```{r}
-#define grid for Kristian
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-#define prior, flat prior in this case
-prior<- rep(1,dens)
-#prior<- ifelse(p_grid<0.5, 0, 1) informed 
-#prior<- exp(-5*abs(p_grid-0.5)) conservative
-
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(2, size = 2, prob = p_grid)
 
@@ -123,25 +132,28 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of a teacher giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
+dK <- data.frame(
+  Name=rep("Kristian",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
+
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dK, aes(Grid,Posterior))+
+  geom_line()+
+  theme_classic()+
+  
+  xlab("knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Kristian's knowledge estimated with a flat prior")
+
 
 #add up posterior probability where p>0.5
 sum(posterior[p_grid>0.5])
 ```
+
+Josh:
 ```{r}
-####################################################################################
-#define grid for Josh
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-#define prior, flat prior in this case
-prior<- rep(1,dens)
-#prior<- ifelse(p_grid<0.5, 0, 1) informed 
-#prior<- exp(-5*abs(p_grid-0.5)) conservative
-
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(160, size = 198, prob = p_grid)
 
@@ -151,27 +163,27 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
+dJ <- data.frame(
+  Name=rep("Josh",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
 
-plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dJ, aes(Grid,Posterior))+
+  geom_line()+
+  theme_classic()+
+  xlab("knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Josh's knowledge estimated with a flat prior")
+
 
 #add up posterior probability where p>0.5
 sum(posterior[p_grid>0.5])
 ```
 
+Mikkel:
 ```{r}
-############################################################################
-#define grid for Mikkel
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-#define prior, flat prior in this case
-prior<- rep(1,dens)
-#prior<- ifelse(p_grid<0.5, 0, 1) informed 
-#prior<- exp(-5*abs(p_grid-0.5)) conservative
-
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(66, size = 132, prob = p_grid)
 
@@ -181,28 +193,53 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
+dM <- data.frame(
+  Name=rep("Mikkel",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
+
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dM, aes(Grid,Posterior))+
+  geom_line()+
+  theme_classic()+
+  xlab("knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Mikkel's knowledge estimated with a flat prior")
+
 
 #add up posterior probability where p>0.5
 sum(posterior[p_grid>0.5])
+```
+
+Together, to actually compare:
+```{r}
+#add up dataframes
+total <- rbind(dR, dK, dJ, dM)
+
+#plot posteriors together
+ggplot(total, aes(x=Grid, y=Posterior, color=Name))+
+  geom_line()+
+  theme_classic()+
+  xlab("knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Teachers' knowledge estimated with a flat prior")
 
 ```
 
 3. Change the prior. Given your teachers have all CogSci jobs, you should start with a higher appreciation of their knowledge: the prior is a normal distribution with a mean of 0.8 and a standard deviation of 0.2. Do the results change (and if so how)?
 3a. Produce plots of the prior and posterior for each teacher.
+The prior:
 ```{r}
-#change the prior
-#prior<- gaussian
-#define grid for Riccardo
+#define grid
 dens=1000
 p_grid<- seq(from=0, to=1, length.out=dens)
 
 #define prior, prior is a normal distribution 
 prior<- dnorm(p_grid, mean=0.8, sd=0.2)
+```
 
+Riccardo:
+```{r}
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(3, size = 6, prob = p_grid)
 
@@ -212,30 +249,41 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
+dRn <- data.frame(
+  Name=rep("Riccardo",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
 
-plot(p_grid, prior, xlab="probability of a teacher giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
 
-#What's Riccardo's most likely parameter for knowledge now?
-p_grid[posterior==max(posterior)] #was: 0.4994995 - 0.5005005 #now: 0.6466466
- 
-#What's the probability of him knowing better than chance?
-#add up posterior probability where p>0.5
-sum(posterior[p_grid>0.5]) #84%
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dRn, aes(Grid,Posterior))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Riccardo's knowledge estimated with a normal prior")
+
+##plot old posterior too
+#add up dataframes
+totalR <- rbind(dR,dRn)
+ggplot(totalR, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Riccardo's knowledge estimated with a uniform vs normal prior")
+
+#plot the prior too
+ggplot(dRn, aes(Grid,Prior))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Prior probability") +
+  labs(title="The normal prior")
 
 ```
 
 Repeat for Kristian:
 ```{r}
-#define grid
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-#define prior, prior is a normal distribution 
-prior<- dnorm(p_grid, mean=0.8, sd=0.2)
-
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(2, size = 2, prob = p_grid)
 
@@ -245,23 +293,30 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Kristian giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
+dKn <- data.frame(
+  Name=rep("Kristian",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+##plot old posterior too
+#add up dataframes
+totalK <- rbind(dK,dKn)
+
+#plot uniform vs normal
+ggplot(totalK, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Kristian's knowledge estimated with a uniform vs normal prior")
 
 
 ```
 
 Now Josh:
 ```{r}
-#define grid
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-#define prior, prior is a normal distribution 
-prior<- dnorm(p_grid, mean=0.8, sd=0.2)
-
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(160, size = 198, prob = p_grid)
 
@@ -271,25 +326,27 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
+dJn <- data.frame(
+  Name=rep("Josh",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+##plot old posterior too
+#add up dataframes
+totalJ <- rbind(dJ,dJn)
+
+#plot uniform vs normal
+ggplot(totalJ, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Josh's knowledge estimated with a uniform vs normal prior")
 ```
 Now Mikkel:
 ```{r}
-#define grid for Mikkel
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
-
-#define prior, prior is a normal distribution 
-prior<- dnorm(p_grid, mean=0.8, sd=0.2)
-
-#prior<- rep(1,dens) flat
-#prior<- ifelse(p_grid<0.5, 0, 1) informed 
-#prior<- exp(-5*abs(p_grid-0.5)) conservative
-
 #compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
 likelihood<- dbinom(66, size = 132, prob = p_grid)
 
@@ -299,20 +356,47 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
-mtext("Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
-mtext("Posterior")
+dMn <- data.frame(
+  Name=rep("Mikkel",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+##plot old posterior too
+#add up dataframes
+totalM <- rbind(dM,dMn)
+
+#plot uniform vs normal
+ggplot(totalM, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Mikkel's knowledge estimated with a uniform vs normal prior")
 ```
 
 4. You go back to your teachers and collect more data (multiply the previous numbers by 100). Calculate their knowledge with both a uniform prior and a normal prior with a mean of 0.8 and a standard deviation of 0.2. Do you still see a difference between the results? Why?
 
+```{r}
+dR<- NULL
+dRn <- NULL
+totalR<- NULL
+dK <- NULL
+dKn <- NULL
+totalK<- NULL
+dJ<- NULL
+dJn<- NULL
+totalJ <- NULL
+dM <- NULL
+dMn <- NULL
+totalM <- NULL
+
+```
+
+
 Riccardo:
 ```{r}
-#define grid for Riccardo
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
 #define prior, flat prior in this case
 prior<- rep(1,dens)
 
@@ -325,12 +409,12 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-#plot
-plot(p_grid, prior, xlab="probability of Riccardo giving a correct answer", ylab="prior probability")
-mtext("Uniform prior")
-plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a uniform prior")
-
+dR <- data.frame(
+  Name=rep("Riccardo",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
 
 ######## NORMAL PRIOR
 #define prior, prior is a normal distribution 
@@ -344,11 +428,21 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior for flat prior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-#plot
-plot(p_grid, prior, xlab="probability of Riccardo giving a correct answer", ylab="prior probability")
-mtext("Normal prior")
-plot(p_grid, posterior, type="b", xlab="probability of Riccardo giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a normal prior")
+dRn <- data.frame(
+  Name=rep("Riccardo",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+##plot old posterior too
+#add up dataframes
+totalR <- rbind(dR,dRn)
+ggplot(totalR, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Riccardo's knowledge estimated with a uniform vs normal prior")
 ```
 
 
@@ -371,11 +465,12 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior for flat prior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-#plot
-plot(p_grid, prior, xlab="probability of Kristian giving a correct answer", ylab="prior probability")
-mtext("Uniform prior")
-plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a uniform prior")
+dK <- data.frame(
+  Name=rep("Kristian",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
 
 ######## NORMAL PRIOR
 
@@ -390,11 +485,24 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior for flat prior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-#plot
-plot(p_grid, prior, xlab="probability of Kristian giving a correct answer", ylab="prior probability")
-mtext("Normal prior")
-plot(p_grid, posterior, type="b", xlab="probability of Kristian giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a normal prior")
+dKn <- data.frame(
+  Name=rep("Kristian",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+##plot old posterior too
+#add up dataframes
+totalK <- rbind(dK,dKn)
+
+#plot uniform vs normal
+ggplot(totalK, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Kristian's knowledge estimated with a uniform vs normal prior")
 ```
 
 
@@ -416,11 +524,19 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
-mtext("Uniform prior")
-plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a uniform prior")
+dJ <- data.frame(
+  Name=rep("Josh",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
 
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dJ, aes(Grid,Posterior))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Josh's knowledge estimated with a flat prior")
 
 ######## NORMAL PRIOR
 #define prior, prior is a normal distribution 
@@ -432,10 +548,24 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Josh giving a correct answer", ylab="prior probability")
-mtext("Normal prior")
-plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a normal prior")
+dJn <- data.frame(
+  Name=rep("Josh",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+##plot old posterior too
+#add up dataframes
+totalJ <- rbind(dJ,dJn)
+
+#plot uniform vs normal
+ggplot(totalJ, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Josh's knowledge estimated with a uniform vs normal prior")
 ```
 
 Mikkel:
@@ -457,10 +587,12 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
-mtext("Uniform Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a uniform prior")
+dM <- data.frame(
+  Name=rep("Mikkel",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Uniform",dens))
 
 
 ######### Normal prior 
@@ -475,20 +607,29 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of Mikkel giving a correct answer", ylab="prior probability")
-mtext("Normal Prior")
-plot(p_grid, posterior, type="b", xlab="probability of Mikkel giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a normal prior")
+dMn <- data.frame(
+  Name=rep("Mikkel",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+##plot old posterior too
+#add up dataframes
+totalM <- rbind(dM,dMn)
+
+#plot uniform vs normal
+ggplot(totalM, aes(x=Grid, y=Posterior, color=Priortype))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Mikkel's knowledge estimated with a uniform vs normal prior")
 ```
 
 
 5. Imagine you're a skeptic and think your teachers do not know anything about CogSci, given the content of their classes. How would you operationalize that belief?
 ```{r}
-#Josh
-#define grid
-dens=1000
-p_grid<- seq(from=0, to=1, length.out=dens)
-
 #normal distribution with the mean 0.5 and std dev of 0.1
 prior<- dnorm(p_grid, mean=0.5, sd=0.1)
 
@@ -501,10 +642,19 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="probability of a teacher giving a correct answer", ylab="prior probability")
-mtext("Skeptic random chance prior")
-plot(p_grid, posterior, type="b", xlab="probability of Josh giving a correct answer", ylab="posterior probability")
-mtext("Posterior with a skeptic prior")
+dRn <- data.frame(
+  Name=rep("Riccardo",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+#plot the prior too
+ggplot(dRn, aes(Grid,Prior))+
+  geom_line()+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Prior probability") +
+  labs(title="The skeptic prior")
 
 ```
 

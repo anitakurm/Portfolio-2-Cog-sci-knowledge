@@ -51,7 +51,7 @@ p_grid<- seq(from=0, to=1, length.out=dens)
 
 ```
 
-Now we use last years posterior as a prior for this year
+WAY 1: we use last years posterior as a prior for this year
 
 Riccardo:
 ```{r}
@@ -83,11 +83,64 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="Riccardo's knowledge parameter", ylab="prior probability")
-mtext("Prior: knowledge estimated last year")
-plot(p_grid, posterior, type="b", xlab="Riccardo's knowledge parameter", ylab="posterior probability")
-mtext("Posterior")
+dRn <- data.frame(
+  Name=rep("Riccardo",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dRn, aes(Grid,Posterior))+
+  geom_line()+
+  geom_line(aes(Grid, prior, color="red"))+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Riccardo's knowledge estimated with the last year's result prior")
+
 ```
+
+```{r}
+### --------------------------- ###
+### A DIFFERENT WAY FROM SLIDES ### WAY 2
+### --------------------------- ###
+
+# Define the grid
+dens = 1000
+p_grid = seq( from=0 , to=1 , length.out=dens)
+
+#define prior, normal prior (0.8,0.2), as we appreciate their knowledge
+prior<- dnorm(p_grid, mean=0.8, sd=0.2)
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(3, size = 6, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+# Get the samples
+samples <- sample(p_grid , prob=posterior , size=1e4 , replace=TRUE )
+
+# Sample all possible p's, weigh them with posterior likelihood of each value of p 
+#size = number of questions
+pred <- rbinom( 1e4 , size = 10 , prob = samples)
+
+#better plot
+predictions <- data.frame(prediction = as.factor(pred),
+                          correct = as.numeric(9))
+predictions$true <- predictions$prediction==predictions$correct
+  
+ggplot(data = predictions, aes(x=prediction, fill=true))+
+  stat_count(width = 0.1)+
+  theme_classic()+
+  labs(title="Prediction of Riccardo's number of correct answers", x= "The number of correct answers", y= "Frequency among samples")
+
+```
+
 
 Kristian:
 ```{r}
@@ -119,16 +172,62 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-plot(p_grid, prior, xlab="Kristian's knowledge parameter", ylab="prior probability")
-mtext("Prior: knowledge estimated last year")
-plot(p_grid, posterior, type="b", xlab="Kristian's knowledge parameter", ylab="posterior probability")
-mtext("Posterior")
+dKn <- data.frame(
+  Name=rep("Kristian",dens),
+  Grid = p_grid,
+  Prior= prior,
+  Posterior = posterior,
+  Priortype=rep("Normal",dens))
+
+
+## GGPLOT, TO MAKE IT PRETTY
+ggplot(dKn, aes(Grid,Posterior))+
+  geom_line()+
+  geom_line(aes(Grid, prior, color="red"))+
+  theme_classic()+
+  xlab("Knowledge parameter")+ ylab("Posterior probability") +
+  labs(title="Kristian's knowledge estimated with the last year's result prior")
+
 ```
+
+```{r}
+##2nd way#################3
+# Define the grid
+#define prior, normal prior (0.8,0.2), as we appreciate their knowledge
+prior<- dnorm(p_grid, mean=0.8, sd=0.2)
+
+#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
+likelihood<- dbinom(2, size = 2, prob = p_grid)
+
+#compute product of likelihood and prior
+unstd.posterior<- likelihood*prior
+
+#standardize the posterior, so it sums to 1
+posterior<- unstd.posterior/sum(unstd.posterior)
+
+# Get the samples
+samples <- sample(p_grid , prob=posterior , size=1e4 , replace=TRUE )
+
+# Sample all possible p's, weigh them with posterior likelihood of each value of p 
+#size = number of questions
+pred <- rbinom( 1e4 , size = 12 , prob = samples)
+
+#better plot
+predictions <- data.frame(prediction = as.factor(pred),
+                          correct = as.numeric(8))
+predictions$true <- predictions$prediction==predictions$correct
+  
+ggplot(data = predictions, aes(x=prediction, fill=true))+
+  stat_count(width = 0.1)+
+  theme_classic()+
+  labs(title="Prediction of Kristian's number of correct answers", x= "The number of correct answers", y= "Frequency among samples")
+```
+
 
 Josh:
 ```{r}
-##### First calculate last years posterior################
-
+##2nd way#################3
+# Define the grid
 #define prior, normal prior (0.8,0.2), as we appreciate their knowledge
 prior<- dnorm(p_grid, mean=0.8, sd=0.2)
 
@@ -141,30 +240,29 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-########## Now use this posterior as a prior for the new data ########
+# Get the samples
+samples <- sample(p_grid , prob=posterior , size=1e4 , replace=TRUE )
 
-#define prior
-prior <- posterior
+# Sample all possible p's, weigh them with posterior likelihood of each value of p 
+#size = number of questions
+pred <- rbinom( 1e4 , size = 172 , prob = samples)
 
-#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
-likelihood<- dbinom(148, size = 172, prob = p_grid)
-
-#compute product of likelihood and prior
-unstd.posterior<- likelihood*prior
-
-#standardize the posterior, so it sums to 1
-posterior<- unstd.posterior/sum(unstd.posterior)
-
-plot(p_grid, prior, xlab="Josh's knowledge parameter", ylab="prior probability")
-mtext("Prior: knowledge estimated last year")
-plot(p_grid, posterior, type="b", xlab="Josh's knowledge parameter", ylab="posterior probability")
-mtext("Posterior")
+#better plot
+predictions <- data.frame(prediction = as.factor(pred),
+                          correct = as.numeric(148))
+predictions$true <- predictions$prediction==predictions$correct
+  
+ggplot(data = predictions, aes(x=prediction, fill=true))+
+  stat_count(width = 0.1)+
+  theme_classic()+
+  labs(title="Prediction of Josh's number of correct answers", x= "The number of correct answers", y= "Frequency among samples")
 ```
+
 
 Mikkel:
 ```{r}
-##### First calculate last years posterior################
-
+##2nd way#################3
+# Define the grid
 #define prior, normal prior (0.8,0.2), as we appreciate their knowledge
 prior<- dnorm(p_grid, mean=0.8, sd=0.2)
 
@@ -177,26 +275,25 @@ unstd.posterior<- likelihood*prior
 #standardize the posterior, so it sums to 1
 posterior<- unstd.posterior/sum(unstd.posterior)
 
-########## Now use this posterior as a prior for the new data ########
+# Get the samples
+samples <- sample(p_grid , prob=posterior , size=1e4 , replace=TRUE )
 
-#define prior
-prior <- posterior
+# Sample all possible p's, weigh them with posterior likelihood of each value of p 
+#size = number of questions
+pred <- rbinom( 1e4 , size = 65 , prob = samples)
 
-#compute likelihood at each value in grid// binomial distribution function (how many correct, size = how many trials, what would be the probability of this data) <- gonna get probability for each possible rate of the correct answer
-likelihood<- dbinom(34, size = 65, prob = p_grid)
+#better plot
+predictions <- data.frame(prediction = as.factor(pred),
+                          correct = as.numeric(34))
+predictions$true <- predictions$prediction==predictions$correct
+  
+ggplot(data = predictions, aes(x=prediction, fill=true))+
+  stat_count(width = 0.1)+
+  theme_classic()+
+  labs(title="Prediction of Mikkel's number of correct answers", x= "The number of correct answers", y= "Frequency among samples")
 
-#compute product of likelihood and prior
-unstd.posterior<- likelihood*prior
 
-#standardize the posterior, so it sums to 1
-posterior<- unstd.posterior/sum(unstd.posterior)
-
-plot(p_grid, prior, xlab="Mikkel's knowledge parameter", ylab="prior probability")
-mtext("Prior: knowledge estimated last year")
-plot(p_grid, posterior, type="b", xlab="Mikkel's knowledge parameter", ylab="posterior probability")
-mtext("Posterior")
 ```
-
 
 
 ### Depending on time: Questions from the handbook
